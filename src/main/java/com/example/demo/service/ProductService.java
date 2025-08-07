@@ -22,6 +22,10 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public List<Product> findAllProducts() {
+        return productRepository.findAll();
+    }
+
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
@@ -39,7 +43,7 @@ public class ProductService {
         if (product.getName() == null || product.getName().isEmpty()) {
             throw new IllegalArgumentException("Product name is required");
         }
-        if (product.getPrice() == null) {
+        if (product.getPrice() == 0) {
             throw new IllegalArgumentException("Product price is required");
         }
         return productRepository.save(product);

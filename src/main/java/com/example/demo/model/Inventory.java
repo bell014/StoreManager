@@ -1,13 +1,9 @@
 package com.example.demo.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Column;
-import javax.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.persistence.Table;
 
-@Entity
+@Entity(name = "Inventory")
 public class Inventory {
 
     @Id

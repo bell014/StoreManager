@@ -4,10 +4,18 @@ import com.example.demo.model.Product;
 import com.example.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+
+import org.springframework.http.HttpStatus;
+
+
+
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {

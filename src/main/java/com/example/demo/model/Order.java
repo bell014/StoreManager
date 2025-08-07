@@ -1,7 +1,9 @@
 package com.example.demo.model;
 
 import java.util.List;
-import javax.persistence.*;
+import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import java.util.Date;
 
 @Entity
 @Table(name = "orders") // Use "orders" as table name to avoid conflict with SQL keyword

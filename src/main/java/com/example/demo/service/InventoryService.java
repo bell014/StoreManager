@@ -4,6 +4,7 @@ import com.example.demo.model.Inventory;
 import com.example.demo.repository.InventoryRepository; // Ensure this import is correct
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 import java.util.Collections;
 import java.util.List; // Ensure this import is correct
 
