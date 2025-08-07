@@ -32,8 +32,7 @@ public class ProductController {
 
     @PostMapping
     public Product createProduct(@RequestBody Product product) {
-        // return productService.saveProduct(product);
- return new Product(); // Placeholder implementation
+        return productService.saveProduct(product);
     }
 
     @PutMapping("/{id}")

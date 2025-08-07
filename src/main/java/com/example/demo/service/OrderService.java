@@ -19,22 +19,55 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
+    /**
+     * Retrieves all orders
+     * @return List of all orders
+     */
     public List<Order> getAllOrders() {
-        // Basic implementation returning an empty list for now
- return orderRepository.findAll();
+        return orderRepository.findAll();
     }
 
+    /**
+     * Finds an order by ID
+     * @param id the order ID to find
+     * @return Optional containing the order if found
+     * @throws IllegalArgumentException if id is null
+     */
     public Optional<Order> getOrderById(Long id) {
-        // Basic implementation returning empty Optional for now
- return orderRepository.findById(id);
+        if (id == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        return orderRepository.findById(id);
     }
 
+    /**
+     * Saves an order
+     * @param order the order to save
+     * @return the saved order
+     * @throws IllegalArgumentException if order is null or missing required fields
+     */
     public Order saveOrder(Order order) {
-        // Basic implementation returning null for now
- return orderRepository.save(order);
+        if (order == null) {
+            throw new IllegalArgumentException("Order cannot be null");
+        }
+        if (order.getOrderDate() == null) {
+            throw new IllegalArgumentException("Order date is required");
+        }
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Order must have at least one item");
+        }
+        return orderRepository.save(order);
     }
 
+    /**
+     * Deletes an order by ID
+     * @param id the order ID to delete
+     * @throws IllegalArgumentException if id is null
+     */
     public void deleteOrder(Long id) {
- orderRepository.deleteById(id);
+        if (id == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        orderRepository.deleteById(id);
     }
 }

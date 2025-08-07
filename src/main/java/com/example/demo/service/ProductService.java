@@ -26,8 +26,23 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+    /**
+     * Saves a product to the database
+     * @param product the product to save (must not be null and must have name and price)
+     * @return the saved product
+     * @throws IllegalArgumentException if product is null or missing required fields
+     */
     public Product saveProduct(Product product) {
- return productRepository.save(product);
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+        if (product.getName() == null || product.getName().isEmpty()) {
+            throw new IllegalArgumentException("Product name is required");
+        }
+        if (product.getPrice() == null) {
+            throw new IllegalArgumentException("Product price is required");
+        }
+        return productRepository.save(product);
     }
 
     public void deleteProduct(Long id) {

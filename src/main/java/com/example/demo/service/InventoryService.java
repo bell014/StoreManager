@@ -22,11 +22,17 @@ public class InventoryService {
     }
 
     // Corrected return type to List<Inventory> as findByProductId likely returns a list
+    /**
+     * Retrieves inventory by product ID
+     * @param productId the ID of the product to find inventory for
+     * @return Optional containing the inventory if found, empty Optional otherwise
+     * @throws IllegalArgumentException if productId is null
+     */
     public Optional<Inventory> getInventoryByProductId(Long productId) {
-        // Assuming findByProductId in repository returns a List<Inventory>
-        // We need to return Optional<Inventory>, which might require adjustment
-        // in the repository or handling the list here. For now, assuming a single result or the first one.
- return inventoryRepository.findByProductId(productId);
+        if (productId == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
+        return inventoryRepository.findByProductId(productId);
     }
 
     public Inventory saveInventory(Inventory inventory) {
