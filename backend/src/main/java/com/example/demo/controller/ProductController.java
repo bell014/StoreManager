@@ -4,17 +4,9 @@ import com.example.demo.model.Product;
 import com.example.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
-
-
-import org.springframework.http.HttpStatus;
-
-
 
 @RestController
 @RequestMapping("/api/products")
@@ -29,13 +21,13 @@ public class ProductController {
 
     @GetMapping
     public List<Product> getAllProducts() {
- return productService.findAllProducts();
+        return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
- Optional<Product> productOptional = productService.getProductById(id);
- return productOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Product> getProductById(@PathVariable String id) {
+        Optional<Product> productOptional = productService.getProductById(id);
+        return productOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -44,28 +36,26 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
- Optional<Product> productOptional = productService.getProductById(id);
+    public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody Product productDetails) {
+        Optional<Product> productOptional = productService.getProductById(id);
         if (productOptional.isPresent()) {
- Product existingProduct = productOptional.get();
+            Product existingProduct = productOptional.get();
             existingProduct.setName(productDetails.getName());
             existingProduct.setDescription(productDetails.getDescription());
             existingProduct.setPrice(productDetails.getPrice());
             existingProduct.setSupplierId(productDetails.getSupplierId());
- return ResponseEntity.ok(productService.saveProduct(existingProduct));
-        } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(productService.saveProduct(existingProduct));
         }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
- Optional<Product> productOptional = productService.getProductById(id);
+    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
+        Optional<Product> productOptional = productService.getProductById(id);
         if (productOptional.isPresent()) {
- productService.deleteProduct(id);
- return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+            productService.deleteProduct(id);
+            return ResponseEntity.noContent().build();
         }
+        return ResponseEntity.notFound().build();
     }
 }

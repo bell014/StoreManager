@@ -1,30 +1,30 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity(name = "Inventory")
+@Document(collection = "inventory")
 public class Inventory {
 
     @Id
-    private Long productId; // Assuming productId is also the primary key for Inventory
+    private String productId;
     private int quantity;
     private String location;
 
     public Inventory() {
     }
 
-    public Inventory(Long productId, int quantity, String location) {
+    public Inventory(String productId, int quantity, String location) {
         this.productId = productId;
         this.quantity = quantity;
         this.location = location;
     }
 
-    public Long getProductId() {
+    public String getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 

@@ -1,8 +1,9 @@
 package com.example.demo.repository;
 
-// import com.example.demo.model.Supplier; // This import is already correct
 import com.example.demo.model.Supplier;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-public interface SupplierRepository extends JpaRepository<Supplier, Long> {
+@Repository
+public interface SupplierRepository extends MongoRepository<Supplier, String> {
 }

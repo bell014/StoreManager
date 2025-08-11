@@ -5,8 +5,7 @@ import com.example.demo.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List; // Correct import for List
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,37 +21,36 @@ public class SupplierController {
 
     @GetMapping
     public ResponseEntity<List<Supplier>> getAllSuppliers() {
- return ResponseEntity.ok(supplierService.findAllSuppliers());
+        return ResponseEntity.ok(supplierService.findAllSuppliers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Supplier> getSupplierById(@PathVariable Long id) {
- Optional<Supplier> supplier = supplierService.findSupplierById(id);
- return supplier.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Supplier> getSupplierById(@PathVariable String id) {
+        Optional<Supplier> supplier = supplierService.findSupplierById(id);
+        return supplier.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<Supplier> createSupplier(@RequestBody Supplier supplier) {
- return ResponseEntity.ok(supplierService.saveSupplier(supplier));
+        return ResponseEntity.ok(supplierService.saveSupplier(supplier));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @RequestBody Supplier supplierDetails) {
- Optional<Supplier> supplierOptional = supplierService.findSupplierById(id);
+    public ResponseEntity<Supplier> updateSupplier(@PathVariable String id, @RequestBody Supplier supplierDetails) {
+        Optional<Supplier> supplierOptional = supplierService.findSupplierById(id);
         if (supplierOptional.isPresent()) {
- Supplier supplier = supplierOptional.get();
- supplier.setName(supplierDetails.getName());
- supplier.setContact(supplierDetails.getContact());
- supplier.setAddress(supplierDetails.getAddress());
- return ResponseEntity.ok(supplierService.saveSupplier(supplier));
-        } else {
- return ResponseEntity.notFound().build();
+            Supplier supplier = supplierOptional.get();
+            supplier.setName(supplierDetails.getName());
+            supplier.setContact(supplierDetails.getContact());
+            supplier.setAddress(supplierDetails.getAddress());
+            return ResponseEntity.ok(supplierService.saveSupplier(supplier));
         }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSupplier(@PathVariable Long id) {
-        // Basic implementation: return no content for now
+    public ResponseEntity<Void> deleteSupplier(@PathVariable String id) {
+        supplierService.deleteSupplier(id);
         return ResponseEntity.noContent().build();
     }
 }

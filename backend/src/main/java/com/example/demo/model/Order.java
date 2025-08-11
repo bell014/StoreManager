@@ -1,37 +1,42 @@
 package com.example.demo.model;
 
-import java.util.List;
-import jakarta.persistence.*;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
+import java.util.List;
 
-@Entity
-@Table(name = "orders") // Use "orders" as table name to avoid conflict with SQL keyword
+@Document(collection = "orders")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "order_date")
+    private String id;
     private Date orderDate;
-    private Long supplierId;
-    private List<Long> items;
+    private String customerId;
+    private String status;
+    private List<OrderItem> items;
 
     public Order() {
+        this.orderDate = new Date();
     }
 
-    public Order(Long id, Date orderDate, Long supplierId, List<Long> items) {
+    public Order(String id, String customerId, String status) {
+        this.id = id;
+        this.customerId = customerId;
+        this.status = status;
+        this.orderDate = new Date();
+    }
+
+    public Order(String id, Date orderDate, String customerId, List<OrderItem> items) {
         this.id = id;
         this.orderDate = orderDate;
-        this.supplierId = supplierId;
+        this.customerId = customerId;
         this.items = items;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -43,19 +48,27 @@ public class Order {
         this.orderDate = orderDate;
     }
 
-    public Long getSupplierId() {
-        return supplierId;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setSupplierId(Long supplierId) {
-        this.supplierId = supplierId;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
-    public List<Long> getItems() {
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public List<OrderItem> getItems() {
         return items;
     }
 
-    public void setItems(List<Long> items) {
+    public void setItems(List<OrderItem> items) {
         this.items = items;
     }
 }

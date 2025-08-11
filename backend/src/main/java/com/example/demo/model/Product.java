@@ -1,24 +1,22 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
-import java.util.Date;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "products")
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     private String name;
     private String description;
-    @Column(nullable = false)
     private double price;
-    private Long supplierId;
+    private String supplierId;
 
     public Product() {
     }
 
-    public Product(Long id, String name, String description, double price, Long supplierId) {
+    public Product(String id, String name, String description, double price, String supplierId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -26,11 +24,11 @@ public class Product {
         this.supplierId = supplierId;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -58,11 +56,11 @@ public class Product {
         this.price = price;
     }
 
-    public Long getSupplierId() {
+    public String getSupplierId() {
         return supplierId;
     }
 
-    public void setSupplierId(Long supplierId) {
+    public void setSupplierId(String supplierId) {
         this.supplierId = supplierId;
     }
 }

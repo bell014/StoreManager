@@ -1,13 +1,13 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document
 public class Supplier {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     private String name;
     private String contact;
     private String address;
@@ -15,18 +15,18 @@ public class Supplier {
     public Supplier() {
     }
 
-    public Supplier(Long id, String name, String contact, String address) {
+    public Supplier(String id, String name, String contact, String address) {
         this.id = id;
         this.name = name;
         this.contact = contact;
         this.address = address;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
