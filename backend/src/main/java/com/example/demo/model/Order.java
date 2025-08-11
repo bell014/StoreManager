@@ -12,17 +12,24 @@ public class Order {
     private Date orderDate;
     private String customerId;
     private String status;
+    private String customerName;
+    private String customerEmail;
+    private String shippingAddress;
     private List<OrderItem> items;
 
     public Order() {
         this.orderDate = new Date();
     }
 
-    public Order(String id, String customerId, String status) {
+    public Order(String id, String customerId, String status, Date orderDate, 
+                String customerName, String customerEmail, String shippingAddress) {
         this.id = id;
         this.customerId = customerId;
         this.status = status;
-        this.orderDate = new Date();
+        this.orderDate = orderDate;
+        this.customerName = customerName;
+        this.customerEmail = customerEmail;
+        this.shippingAddress = shippingAddress;
     }
 
     public Order(String id, Date orderDate, String customerId, List<OrderItem> items) {
@@ -62,6 +69,30 @@ public class Order {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
     }
 
     public List<OrderItem> getItems() {

@@ -2,41 +2,52 @@ import React, { useState, useEffect } from "react";
 import { 
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, 
   Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, 
-  useDisclosure, Input, Spinner 
+  useDisclosure, Input, Spinner, Select, SelectItem 
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { fetchProducts, createProduct, deleteProduct } from "../apiService";
+import { 
+  fetchProducts, 
+  createProduct, 
+  updateProduct,
+  deleteProduct,
+  fetchSuppliers
+} from "../apiService";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
-  supplierId: number;
+  supplierId: string;
 }
 
 export const ProductList: React.FC = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [products, setProducts] = useState<Product[]>([]);
+  const [suppliers, setSuppliers] = useState<{id: string, name: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modalAction, setModalAction] = useState<'add' | 'delete'>('add');
+  const [modalAction, setModalAction] = useState<'add' | 'edit' | 'delete'>('add');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({ 
+  const [productForm, setProductForm] = useState<Omit<Product, 'id'>>({ 
     name: '', 
     description: '', 
     price: 0, 
-    supplierId: 0 
+    supplierId: '' 
   });
 
-  const loadProducts = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const data = await fetchProducts();
-      setProducts(data);
+      const [productsData, suppliersData] = await Promise.all([
+        fetchProducts(),
+        fetchSuppliers()
+      ]);
+      setProducts(productsData);
+      setSuppliers(suppliersData.map(s => ({id: s.id, name: s.name})));
       setError(null);
     } catch (err) {
-      setError("Failed to load products");
+      setError("Failed to load data");
       console.error(err);
     } finally {
       setLoading(false);
@@ -45,32 +56,42 @@ export const ProductList: React.FC = () => {
 
   const handleAddProduct = () => {
     setModalAction('add');
-    setNewProduct({ name: '', description: '', price: 0, supplierId: 0 });
+    setProductForm({ name: '', description: '', price: 0, supplierId: '' });
     onOpen();
   };
 
-  const handleCreateProduct = async () => {
+  const handleEditProduct = (product: Product) => {
+    setModalAction('edit');
+    setSelectedProduct(product);
+    setProductForm({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      supplierId: product.supplierId
+    });
+    onOpen();
+  };
+
+  const handleSubmitProduct = async () => {
     try {
-      await createProduct(newProduct);
-      await loadProducts();
+      if (modalAction === 'add') {
+        await createProduct(productForm);
+      } else if (modalAction === 'edit' && selectedProduct) {
+        await updateProduct(selectedProduct.id, productForm);
+      }
+      await loadData();
       onOpenChange();
     } catch (err) {
-      setError("Failed to create product");
+      setError(`Failed to ${modalAction} product`);
       console.error(err);
     }
   };
 
-  const handleDeleteProduct = (product: Product) => {
-    setModalAction('delete');
-    setSelectedProduct(product);
-    onOpen();
-  };
-
-  const confirmDelete = async () => {
+  const handleDeleteProduct = async () => {
     if (!selectedProduct) return;
     try {
       await deleteProduct(selectedProduct.id);
-      await loadProducts();
+      await loadData();
       onOpenChange();
     } catch (err) {
       setError("Failed to delete product");
@@ -79,7 +100,7 @@ export const ProductList: React.FC = () => {
   };
 
   useEffect(() => {
-    loadProducts();
+    loadData();
   }, []);
 
   if (loading) {
@@ -115,7 +136,13 @@ export const ProductList: React.FC = () => {
               <TableCell>${product.price.toFixed(2)}</TableCell>
               <TableCell>{product.supplierId}</TableCell>
               <TableCell>
-                <Button isIconOnly size="sm" variant="light" aria-label="Edit product">
+                <Button 
+                  isIconOnly 
+                  size="sm" 
+                  variant="light" 
+                  aria-label="Edit product"
+                  onPress={() => handleEditProduct(product)}
+                >
                   <Icon icon="lucide:edit" />
                 </Button>
                 <Button 
@@ -139,32 +166,39 @@ export const ProductList: React.FC = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {modalAction === 'add' ? 'Add New Product' : 'Delete Product'}
+                {modalAction === 'add' ? 'Add New Product' : 
+                 modalAction === 'edit' ? 'Edit Product' : 'Delete Product'}
               </ModalHeader>
               <ModalBody>
-                {modalAction === 'add' ? (
+                {modalAction !== 'delete' ? (
                   <div className="space-y-4">
                     <Input
                       label="Name"
-                      value={newProduct.name}
-                      onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                      value={productForm.name}
+                      onChange={(e) => setProductForm({...productForm, name: e.target.value})}
                     />
                     <Input
                       label="Description"
-                      value={newProduct.description}
-                      onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                      value={productForm.description}
+                      onChange={(e) => setProductForm({...productForm, description: e.target.value})}
                     />
                     <Input
                       type="number"
                       label="Price"
-                      value={newProduct.price.toString()}
-                      onChange={(e) => setNewProduct({...newProduct, price: parseFloat(e.target.value)})}
+                      value={productForm.price.toString()}
+                      onChange={(e) => setProductForm({...productForm, price: parseFloat(e.target.value)})}
                     />
-                    <Input
-                      type="number"
-                      label="Supplier ID"
-                      value={newProduct.supplierId.toString()}
-                      onChange={(e) => setNewProduct({...newProduct, supplierId: parseInt(e.target.value)})}
+                    <Select
+                      label="Supplier"
+                      selectedKeys={productForm.supplierId ? [productForm.supplierId] : []}
+                      onChange={(e) => setProductForm({...productForm, supplierId: e.target.value})}
+                    >
+                      {suppliers.map((supplier) => (
+                        <SelectItem key={supplier.id} value={supplier.id}>
+                          {supplier.name}
+                        </SelectItem>
+                      ))}
+                    </Select>
                     />
                   </div>
                 ) : (
@@ -176,10 +210,11 @@ export const ProductList: React.FC = () => {
                   Cancel
                 </Button>
                 <Button 
-                  color={modalAction === 'add' ? 'primary' : 'danger'} 
-                  onPress={modalAction === 'add' ? handleCreateProduct : confirmDelete}
+                  color={modalAction === 'delete' ? 'danger' : 'primary'} 
+                  onPress={modalAction === 'delete' ? handleDeleteProduct : handleSubmitProduct}
                 >
-                  {modalAction === 'add' ? 'Add' : 'Delete'}
+                  {modalAction === 'add' ? 'Add' : 
+                   modalAction === 'edit' ? 'Update' : 'Delete'}
                 </Button>
               </ModalFooter>
             </>

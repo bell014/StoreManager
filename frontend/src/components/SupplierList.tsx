@@ -5,12 +5,13 @@ import {
   useDisclosure, Input, Spinner 
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { fetchSuppliers, createSupplier, deleteSupplier } from "../apiService";
+import { fetchSuppliers, createSupplier, updateSupplier, deleteSupplier } from "../apiService";
 
 interface Supplier {
-  id: number;
+  id: string;
   name: string;
-  contact: string;
+  email: string;
+  phone: string;
   address: string;
 }
 
@@ -19,11 +20,12 @@ export const SupplierList: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modalAction, setModalAction] = useState<'add' | 'delete'>('add');
+  const [modalAction, setModalAction] = useState<'add' | 'edit' | 'delete'>('add');
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
-  const [newSupplier, setNewSupplier] = useState<Omit<Supplier, 'id'>>({ 
+  const [supplierForm, setSupplierForm] = useState<Omit<Supplier, 'id'>>({ 
     name: '', 
-    contact: '', 
+    email: '', 
+    phone: '',
     address: '' 
   });
 
@@ -43,28 +45,38 @@ export const SupplierList: React.FC = () => {
 
   const handleAddSupplier = () => {
     setModalAction('add');
-    setNewSupplier({ name: '', contact: '', address: '' });
+    setSupplierForm({ name: '', email: '', phone: '', address: '' });
     onOpen();
   };
 
-  const handleCreateSupplier = async () => {
+  const handleEditSupplier = (supplier: Supplier) => {
+    setModalAction('edit');
+    setSelectedSupplier(supplier);
+    setSupplierForm({
+      name: supplier.name,
+      email: supplier.email,
+      phone: supplier.phone,
+      address: supplier.address
+    });
+    onOpen();
+  };
+
+  const handleSubmitSupplier = async () => {
     try {
-      await createSupplier(newSupplier);
+      if (modalAction === 'add') {
+        await createSupplier(supplierForm);
+      } else if (modalAction === 'edit' && selectedSupplier) {
+        await updateSupplier(selectedSupplier.id, supplierForm);
+      }
       await loadSuppliers();
       onOpenChange();
     } catch (err) {
-      setError("Failed to create supplier");
+      setError(`Failed to ${modalAction} supplier`);
       console.error(err);
     }
   };
 
-  const handleDeleteSupplier = (supplier: Supplier) => {
-    setModalAction('delete');
-    setSelectedSupplier(supplier);
-    onOpen();
-  };
-
-  const confirmDelete = async () => {
+  const handleDeleteSupplier = async () => {
     if (!selectedSupplier) return;
     try {
       await deleteSupplier(selectedSupplier.id);
@@ -100,7 +112,8 @@ export const SupplierList: React.FC = () => {
       <Table aria-label="Suppliers table" removeWrapper>
         <TableHeader>
           <TableColumn>NAME</TableColumn>
-          <TableColumn>CONTACT</TableColumn>
+          <TableColumn>EMAIL</TableColumn>
+          <TableColumn>PHONE</TableColumn>
           <TableColumn>ADDRESS</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
@@ -108,10 +121,17 @@ export const SupplierList: React.FC = () => {
           {suppliers.map((supplier) => (
             <TableRow key={supplier.id}>
               <TableCell>{supplier.name}</TableCell>
-              <TableCell>{supplier.contact}</TableCell>
+              <TableCell>{supplier.email}</TableCell>
+              <TableCell>{supplier.phone}</TableCell>
               <TableCell>{supplier.address}</TableCell>
               <TableCell>
-                <Button isIconOnly size="sm" variant="light" aria-label="Edit supplier">
+                <Button 
+                  isIconOnly 
+                  size="sm" 
+                  variant="light" 
+                  aria-label="Edit supplier"
+                  onPress={() => handleEditSupplier(supplier)}
+                >
                   <Icon icon="lucide:edit" />
                 </Button>
                 <Button 
@@ -120,7 +140,11 @@ export const SupplierList: React.FC = () => {
                   variant="light" 
                   color="danger" 
                   aria-label="Delete supplier" 
-                  onPress={() => handleDeleteSupplier(supplier)}
+                  onPress={() => {
+                    setSelectedSupplier(supplier);
+                    setModalAction('delete');
+                    onOpen();
+                  }}
                 >
                   <Icon icon="lucide:trash" />
                 </Button>
@@ -135,25 +159,31 @@ export const SupplierList: React.FC = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {modalAction === 'add' ? 'Add New Supplier' : 'Delete Supplier'}
+                {modalAction === 'add' ? 'Add New Supplier' : 
+                 modalAction === 'edit' ? 'Edit Supplier' : 'Delete Supplier'}
               </ModalHeader>
               <ModalBody>
-                {modalAction === 'add' ? (
+                {modalAction !== 'delete' ? (
                   <div className="space-y-4">
                     <Input
                       label="Name"
-                      value={newSupplier.name}
-                      onChange={(e) => setNewSupplier({...newSupplier, name: e.target.value})}
+                      value={supplierForm.name}
+                      onChange={(e) => setSupplierForm({...supplierForm, name: e.target.value})}
                     />
                     <Input
-                      label="Contact"
-                      value={newSupplier.contact}
-                      onChange={(e) => setNewSupplier({...newSupplier, contact: e.target.value})}
+                      label="Email"
+                      value={supplierForm.email}
+                      onChange={(e) => setSupplierForm({...supplierForm, email: e.target.value})}
+                    />
+                    <Input
+                      label="Phone"
+                      value={supplierForm.phone}
+                      onChange={(e) => setSupplierForm({...supplierForm, phone: e.target.value})}
                     />
                     <Input
                       label="Address"
-                      value={newSupplier.address}
-                      onChange={(e) => setNewSupplier({...newSupplier, address: e.target.value})}
+                      value={supplierForm.address}
+                      onChange={(e) => setSupplierForm({...supplierForm, address: e.target.value})}
                     />
                   </div>
                 ) : (
@@ -165,10 +195,11 @@ export const SupplierList: React.FC = () => {
                   Cancel
                 </Button>
                 <Button 
-                  color={modalAction === 'add' ? 'primary' : 'danger'} 
-                  onPress={modalAction === 'add' ? handleCreateSupplier : confirmDelete}
+                  color={modalAction === 'delete' ? 'danger' : 'primary'} 
+                  onPress={modalAction === 'delete' ? handleDeleteSupplier : handleSubmitSupplier}
                 >
-                  {modalAction === 'add' ? 'Add' : 'Delete'}
+                  {modalAction === 'add' ? 'Add' : 
+                   modalAction === 'edit' ? 'Update' : 'Delete'}
                 </Button>
               </ModalFooter>
             </>

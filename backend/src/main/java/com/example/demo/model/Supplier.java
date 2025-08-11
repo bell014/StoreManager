@@ -3,23 +3,26 @@ package com.example.demo.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection = "suppliers")
 public class Supplier {
-
     @Id
     private String id;
     private String name;
-    private String contact;
+    private String email;
     private String address;
+    private String phone;
+    private String website;
 
     public Supplier() {
     }
 
-    public Supplier(String id, String name, String contact, String address) {
+    public Supplier(String id, String name, String email, String address, String phone, String website) {
         this.id = id;
         this.name = name;
-        this.contact = contact;
+        this.email = email;
         this.address = address;
+        this.phone = phone;
+        this.website = website;
     }
 
     public String getId() {
@@ -38,12 +41,12 @@ public class Supplier {
         this.name = name;
     }
 
-    public String getContact() {
-        return contact;
+    public String getEmail() {
+        return email;
     }
 
-    public void setContact(String contact) {
-        this.contact = contact;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getAddress() {
@@ -52,5 +55,21 @@ public class Supplier {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 }

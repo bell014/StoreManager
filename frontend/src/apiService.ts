@@ -13,14 +13,14 @@ export const fetchInventory = async () => {
   }
 };
 
-export const updateInventoryItem = async (productId: number, quantity: number) => {
+export const updateInventoryItem = async (productId: string, quantity: number, location: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/inventory/${productId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ quantity }),
+      body: JSON.stringify({ quantity, location }),
     });
     if (!response.ok) {
       throw new Error('Failed to update inventory');
@@ -45,7 +45,36 @@ export const fetchProducts = async () => {
   }
 };
 
-export const createProduct = async (product: { name: string, description: string, price: number, supplierId: number }) => {
+export const updateProduct = async (productId: string, product: { 
+  name: string, 
+  description: string, 
+  price: number, 
+  supplierId: string 
+}) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(product),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update product');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
+};
+
+export const createProduct = async (product: { 
+  name: string, 
+  description: string, 
+  price: number, 
+  supplierId: string 
+}) => {
   try {
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: 'POST',
@@ -64,7 +93,7 @@ export const createProduct = async (product: { name: string, description: string
   }
 };
 
-export const deleteProduct = async (productId: number) => {
+export const deleteProduct = async (productId: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
       method: 'DELETE',
@@ -91,7 +120,38 @@ export const fetchSuppliers = async () => {
   }
 };
 
-export const createSupplier = async (supplier: { name: string, contact: string, address: string }) => {
+export const updateSupplier = async (supplierId: string, supplier: { 
+  name: string, 
+  email: string, 
+  address: string,
+  phone: string,
+  website: string 
+}) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/suppliers/${supplierId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(supplier),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update supplier');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating supplier:', error);
+    throw error;
+  }
+};
+
+export const createSupplier = async (supplier: { 
+  name: string, 
+  email: string, 
+  address: string,
+  phone: string,
+  website: string 
+}) => {
   try {
     const response = await fetch(`${API_BASE_URL}/suppliers`, {
       method: 'POST',
@@ -110,7 +170,7 @@ export const createSupplier = async (supplier: { name: string, contact: string, 
   }
 };
 
-export const deleteSupplier = async (supplierId: number) => {
+export const deleteSupplier = async (supplierId: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/suppliers/${supplierId}`, {
       method: 'DELETE',
@@ -137,7 +197,42 @@ export const fetchOrders = async () => {
   }
 };
 
-export const createOrder = async (order: { supplierId: number, items: number[] }) => {
+export const updateOrder = async (orderId: string, order: {
+  status: string,
+  customerName?: string,
+  customerEmail?: string,
+  shippingAddress?: string
+}) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(order),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update order');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating order:', error);
+    throw error;
+  }
+};
+
+export const createOrder = async (order: { 
+  customerId: string,
+  status: string,
+  customerName: string,
+  customerEmail: string,
+  shippingAddress: string,
+  items: Array<{
+    productId: string,
+    quantity: number,
+    price: number
+  }>
+}) => {
   try {
     const response = await fetch(`${API_BASE_URL}/orders`, {
       method: 'POST',
@@ -156,7 +251,7 @@ export const createOrder = async (order: { supplierId: number, items: number[] }
   }
 };
 
-export const deleteOrder = async (orderId: number) => {
+export const deleteOrder = async (orderId: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
       method: 'DELETE',
