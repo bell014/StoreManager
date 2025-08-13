@@ -7,6 +7,10 @@ import java.util.List;
 
 @Document(collection = "orders")
 public class Order {
+    public static final String STATUS_SUCCESS = "success";
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_DECLINED = "declined";
+    
     @Id
     private String id;
     private Date orderDate;
@@ -19,6 +23,19 @@ public class Order {
 
     public Order() {
         this.orderDate = new Date();
+        this.status = STATUS_PENDING; // Default status
+    }
+
+    public boolean isSuccessful() {
+        return STATUS_SUCCESS.equals(this.status);
+    }
+
+    public boolean isPending() {
+        return STATUS_PENDING.equals(this.status);
+    }
+
+    public boolean isDeclined() {
+        return STATUS_DECLINED.equals(this.status);
     }
 
     public Order(String id, String customerId, String status, Date orderDate, 

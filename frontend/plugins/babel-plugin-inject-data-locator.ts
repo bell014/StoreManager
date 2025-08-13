@@ -111,8 +111,20 @@ const createPluginLogic = (babel: {types: typeof BabelTypes}, options: CustomPlu
             elementName = openingElement.name.property.name;
           }
 
-          // Skip React Fragments
-          if (elementName === "Fragment") {
+          // Skip React Fragments, core components, and UI library components
+          const excludedComponents = new Set([
+            'Fragment', 
+            'StrictMode',
+            'HeroUIProvider',
+            'Router',
+            'Navbar',
+            'NavbarBrand',
+            'NavbarContent',
+            'NavbarItem',
+            'Link'
+          ]);
+          
+          if (excludedComponents.has(elementName)) {
             return;
           }
 

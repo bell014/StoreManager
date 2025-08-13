@@ -60,4 +60,21 @@ public class OrderController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/count/successful")
+    public ResponseEntity<Long> countSuccessfulOrders() {
+        return ResponseEntity.ok(orderService.countSuccessfulOrders());
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<Order>> getOrdersByStatus(@PathVariable String status) {
+        return ResponseEntity.ok(orderService.getOrdersByStatus(status));
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Order> updateOrderStatus(
+            @PathVariable String id,
+            @RequestParam String status) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
+    }
 }

@@ -25,6 +25,21 @@ export const InventoryList: React.FC = () => {
     quantity: 0,
     location: ''
   });
+  const [formErrors, setFormErrors] = useState({
+    quantity: '',
+    location: ''
+  });
+
+  const validateForm = () => {
+    const errors = {
+      quantity: isNaN(editForm.quantity) ? 'Quantity must be a number' :
+               editForm.quantity < 0 ? 'Quantity cannot be negative' : '',
+      location: !editForm.location ? 'Location is required' : 
+               editForm.location.length > 50 ? 'Location must be 50 characters or less' : ''
+    };
+    setFormErrors(errors);
+    return !Object.values(errors).some(error => error !== '');
+  };
 
   const loadInventory = async () => {
     try {
@@ -50,14 +65,19 @@ export const InventoryList: React.FC = () => {
   };
 
   const handleUpdate = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || !validateForm()) return;
     try {
+      setLoading(true);
+      setError(null);
       await updateInventoryItem(selectedItem.productId, editForm.quantity, editForm.location);
       await loadInventory();
       onOpenChange();
     } catch (err) {
-      setError("Failed to update inventory");
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(`Failed to update inventory: ${errorMessage}`);
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,12 +146,23 @@ export const InventoryList: React.FC = () => {
                     type="number"
                     label="Quantity"
                     value={editForm.quantity.toString()}
-                    onChange={(e) => setEditForm({...editForm, quantity: parseInt(e.target.value)})}
+                    isInvalid={!!formErrors.quantity}
+                    errorMessage={formErrors.quantity}
+                    onChange={(e) => {
+                      const quantity = parseInt(e.target.value) || 0;
+                      setEditForm({...editForm, quantity});
+                      setFormErrors({...formErrors, quantity: ''});
+                    }}
                   />
                   <Input
                     label="Location"
                     value={editForm.location}
-                    onChange={(e) => setEditForm({...editForm, location: e.target.value})}
+                    isInvalid={!!formErrors.location}
+                    errorMessage={formErrors.location}
+                    onChange={(e) => {
+                      setEditForm({...editForm, location: e.target.value});
+                      setFormErrors({...formErrors, location: ''});
+                    }}
                   />
                 </div>
               </ModalBody>
@@ -139,9 +170,16 @@ export const InventoryList: React.FC = () => {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button color="primary" onPress={handleUpdate}>
+                <Button 
+                  color="primary" 
+                  onPress={handleUpdate}
+                  isDisabled={!validateForm()}
+                >
                   Update
                 </Button>
+                <div className="text-xs text-gray-500 mt-2">
+                  * All fields are required
+                </div>
               </ModalFooter>
             </>
           )}

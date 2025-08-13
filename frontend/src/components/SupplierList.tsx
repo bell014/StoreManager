@@ -28,6 +28,27 @@ export const SupplierList: React.FC = () => {
     phone: '',
     address: '' 
   });
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
+
+  const validateForm = () => {
+    const errors = {
+      name: !supplierForm.name ? 'Name is required' : 
+            supplierForm.name.length > 100 ? 'Name must be 100 characters or less' : '',
+      email: !supplierForm.email ? 'Email is required' : 
+             !/^\S+@\S+\.\S+$/.test(supplierForm.email) ? 'Invalid email format' : '',
+      phone: !supplierForm.phone ? 'Phone is required' : 
+             !/^[\d\s\-()+]+$/.test(supplierForm.phone) ? 'Invalid phone number' : '',
+      address: !supplierForm.address ? 'Address is required' : 
+               supplierForm.address.length > 200 ? 'Address must be 200 characters or less' : ''
+    };
+    setFormErrors(errors);
+    return !Object.values(errors).some(error => error !== '');
+  };
 
   const loadSuppliers = async () => {
     try {
@@ -62,17 +83,26 @@ export const SupplierList: React.FC = () => {
   };
 
   const handleSubmitSupplier = async () => {
+    if (!validateForm()) return;
+    
     try {
+      setLoading(true);
+      setError(null);
+      
       if (modalAction === 'add') {
         await createSupplier(supplierForm);
       } else if (modalAction === 'edit' && selectedSupplier) {
         await updateSupplier(selectedSupplier.id, supplierForm);
       }
+      
       await loadSuppliers();
       onOpenChange();
     } catch (err) {
-      setError(`Failed to ${modalAction} supplier`);
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(`Failed to ${modalAction} supplier: ${errorMessage}`);
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -168,22 +198,42 @@ export const SupplierList: React.FC = () => {
                     <Input
                       label="Name"
                       value={supplierForm.name}
-                      onChange={(e) => setSupplierForm({...supplierForm, name: e.target.value})}
+                      isInvalid={!!formErrors.name}
+                      errorMessage={formErrors.name}
+                      onChange={(e) => {
+                        setSupplierForm({...supplierForm, name: e.target.value});
+                        setFormErrors({...formErrors, name: ''});
+                      }}
                     />
                     <Input
                       label="Email"
                       value={supplierForm.email}
-                      onChange={(e) => setSupplierForm({...supplierForm, email: e.target.value})}
+                      isInvalid={!!formErrors.email}
+                      errorMessage={formErrors.email}
+                      onChange={(e) => {
+                        setSupplierForm({...supplierForm, email: e.target.value});
+                        setFormErrors({...formErrors, email: ''});
+                      }}
                     />
                     <Input
                       label="Phone"
                       value={supplierForm.phone}
-                      onChange={(e) => setSupplierForm({...supplierForm, phone: e.target.value})}
+                      isInvalid={!!formErrors.phone}
+                      errorMessage={formErrors.phone}
+                      onChange={(e) => {
+                        setSupplierForm({...supplierForm, phone: e.target.value});
+                        setFormErrors({...formErrors, phone: ''});
+                      }}
                     />
                     <Input
                       label="Address"
                       value={supplierForm.address}
-                      onChange={(e) => setSupplierForm({...supplierForm, address: e.target.value})}
+                      isInvalid={!!formErrors.address}
+                      errorMessage={formErrors.address}
+                      onChange={(e) => {
+                        setSupplierForm({...supplierForm, address: e.target.value});
+                        setFormErrors({...formErrors, address: ''});
+                      }}
                     />
                   </div>
                 ) : (
@@ -201,6 +251,11 @@ export const SupplierList: React.FC = () => {
                   {modalAction === 'add' ? 'Add' : 
                    modalAction === 'edit' ? 'Update' : 'Delete'}
                 </Button>
+                {modalAction !== 'delete' && (
+                  <div className="text-xs text-gray-500 mt-2">
+                    * All fields are required
+                  </div>
+                )}
               </ModalFooter>
             </>
           )}

@@ -66,4 +66,25 @@ public class OrderService {
         // Delete the order (items are embedded and will be deleted automatically)
         orderRepository.deleteById(id);
     }
+
+    public long countSuccessfulOrders() {
+        return orderRepository.countByStatus(Order.STATUS_SUCCESS);
+    }
+
+    public List<Order> getOrdersByStatus(String status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+        return orderRepository.findByStatus(status);
+    }
+
+    public Order updateOrderStatus(String id, String status) {
+        if (id == null || status == null) {
+            throw new IllegalArgumentException("ID and status cannot be null");
+        }
+        return orderRepository.findById(id).map(order -> {
+            order.setStatus(status);
+            return orderRepository.save(order);
+        }).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+    }
 }

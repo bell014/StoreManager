@@ -2,31 +2,41 @@ import React, { useState, useEffect } from "react";
 import { 
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, 
   Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, 
-  useDisclosure, Spinner, Select, SelectItem 
+  useDisclosure, Spinner, Select, SelectItem, Input 
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { fetchOrders, createOrder, deleteOrder, fetchSuppliers, fetchProducts } from "../apiService";
 
+interface OrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+}
+
 interface Order {
-  id: number;
+  id: string;
   orderDate: string;
-  supplierId: number;
-  items: number[];
+  customerId: string;
+  status: string;
+  customerName: string;
+  customerEmail: string;
+  shippingAddress: string;
+  items: OrderItem[];
 }
 
 interface Supplier {
-  id: number;
+  id: string;
   name: string;
   contact: string;
   address: string;
 }
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
-  supplierId: number;
+  supplierId: string;
 }
 
 export const OrderList: React.FC = () => {
@@ -39,7 +49,11 @@ export const OrderList: React.FC = () => {
   const [modalAction, setModalAction] = useState<'add' | 'delete'>('add');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [newOrder, setNewOrder] = useState<Omit<Order, 'id'>>({ 
-    supplierId: 0,
+    customerId: '',
+    status: 'pending',
+    customerName: '',
+    customerEmail: '',
+    shippingAddress: '',
     items: []
   });
 
@@ -65,13 +79,24 @@ export const OrderList: React.FC = () => {
 
   const handleAddOrder = () => {
     setModalAction('add');
-    setNewOrder({ supplierId: 0, items: [] });
+    setNewOrder({ 
+      customerId: '',
+      status: 'pending',
+      customerName: '',
+      customerEmail: '',
+      shippingAddress: '',
+      items: [] 
+    });
     onOpen();
   };
 
   const handleCreateOrder = async () => {
     try {
-      await createOrder(newOrder);
+      const orderToCreate = {
+        ...newOrder,
+        orderDate: new Date().toISOString()
+      };
+      await createOrder(orderToCreate);
       await loadData();
       onOpenChange();
     } catch (err) {
@@ -102,13 +127,19 @@ export const OrderList: React.FC = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const handleSupplierChange = (keys: Set<string>) => {
-    const selectedKey = Array.from(keys)[0];
-    setNewOrder({...newOrder, supplierId: parseInt(selectedKey)});
+  const handleCustomerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewOrder({...newOrder, customerId: e.target.value});
   };
 
   const handleProductsChange = (keys: Set<string>) => {
-    setNewOrder({...newOrder, items: Array.from(keys).map(Number)});
+    setNewOrder({
+      ...newOrder, 
+      items: Array.from(keys).map(productId => ({
+        productId,
+        quantity: 1,
+        price: products.find(p => p.id === productId)?.price || 0
+      }))
+    });
   };
 
   useEffect(() => {
@@ -134,11 +165,12 @@ export const OrderList: React.FC = () => {
       </div>
       <Table aria-label="Orders table" removeWrapper>
         <TableHeader>
-          <TableColumn>ORDER ID</TableColumn>
-          <TableColumn>SUPPLIER</TableColumn>
-          <TableColumn>ITEMS COUNT</TableColumn>
-          <TableColumn>DATE</TableColumn>
-          <TableColumn>ACTIONS</TableColumn>
+        <TableColumn>ORDER ID</TableColumn>
+        <TableColumn>CUSTOMER</TableColumn>
+        <TableColumn>STATUS</TableColumn>
+        <TableColumn>ITEMS COUNT</TableColumn>
+        <TableColumn>DATE</TableColumn>
+        <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
           {orders.map((order) => {
@@ -146,7 +178,16 @@ export const OrderList: React.FC = () => {
             return (
               <TableRow key={order.id}>
                 <TableCell>{order.id}</TableCell>
-                <TableCell>{supplier?.name || 'Unknown'}</TableCell>
+                <TableCell>{order.customerName || 'Unknown'}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    order.status === 'success' ? 'bg-green-100 text-green-800' :
+                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {order.status}
+                  </span>
+                </TableCell>
                 <TableCell>{order.items.length}</TableCell>
                 <TableCell>{formatDate(order.orderDate)}</TableCell>
                 <TableCell>
@@ -170,7 +211,13 @@ export const OrderList: React.FC = () => {
         </TableBody>
       </Table>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal 
+        isOpen={isOpen} 
+        onOpenChange={onOpenChange}
+        placement="center"
+        backdrop="opaque"
+        style={{ zIndex: 1000 }}
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -180,17 +227,21 @@ export const OrderList: React.FC = () => {
               <ModalBody>
                 {modalAction === 'add' ? (
                   <div className="space-y-4">
-                    <Select
-                      label="Supplier"
-                      selectedKeys={newOrder.supplierId ? [newOrder.supplierId.toString()] : []}
-                      onSelectionChange={handleSupplierChange}
-                    >
-                      {suppliers.map((supplier) => (
-                        <SelectItem key={supplier.id} value={supplier.id}>
-                          {supplier.name}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                    <Input
+                      label="Customer Name"
+                      value={newOrder.customerName}
+                      onChange={(e) => setNewOrder({...newOrder, customerName: e.target.value})}
+                    />
+                    <Input
+                      label="Customer Email"
+                      value={newOrder.customerEmail}
+                      onChange={(e) => setNewOrder({...newOrder, customerEmail: e.target.value})}
+                    />
+                    <Input
+                      label="Shipping Address"
+                      value={newOrder.shippingAddress}
+                      onChange={(e) => setNewOrder({...newOrder, shippingAddress: e.target.value})}
+                    />
                     <Select
                       label="Products"
                       selectionMode="multiple"

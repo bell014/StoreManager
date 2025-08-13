@@ -35,6 +35,7 @@ export const ProductList: React.FC = () => {
     price: 0, 
     supplierId: '' 
   });
+  const [formErrors, setFormErrors] = useState<{name?: string; price?: string; supplierId?: string}>({});
 
   const loadData = async () => {
     try {
@@ -54,9 +55,19 @@ export const ProductList: React.FC = () => {
     }
   };
 
+  const validateForm = () => {
+    const errors: typeof formErrors = {};
+    if (!productForm.name.trim()) errors.name = "Name is required";
+    if (isNaN(productForm.price) || productForm.price <= 0) errors.price = "Price must be greater than 0";
+    if (!productForm.supplierId) errors.supplierId = "Supplier is required";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAddProduct = () => {
     setModalAction('add');
     setProductForm({ name: '', description: '', price: 0, supplierId: '' });
+    setFormErrors({});
     onOpen();
   };
 
@@ -69,10 +80,18 @@ export const ProductList: React.FC = () => {
       price: product.price,
       supplierId: product.supplierId
     });
+    setFormErrors({});
+    onOpen();
+  };
+
+  const handleConfirmDelete = (product: Product) => {
+    setModalAction('delete');
+    setSelectedProduct(product);
     onOpen();
   };
 
   const handleSubmitProduct = async () => {
+    if (!validateForm()) return;
     try {
       if (modalAction === 'add') {
         await createProduct(productForm);
@@ -125,7 +144,7 @@ export const ProductList: React.FC = () => {
           <TableColumn>NAME</TableColumn>
           <TableColumn>DESCRIPTION</TableColumn>
           <TableColumn>PRICE</TableColumn>
-          <TableColumn>SUPPLIER ID</TableColumn>
+          <TableColumn>SUPPLIER</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
@@ -134,7 +153,7 @@ export const ProductList: React.FC = () => {
               <TableCell>{product.name}</TableCell>
               <TableCell>{product.description}</TableCell>
               <TableCell>${product.price.toFixed(2)}</TableCell>
-              <TableCell>{product.supplierId}</TableCell>
+              <TableCell>{suppliers.find(s => s.id === product.supplierId)?.name || product.supplierId}</TableCell>
               <TableCell>
                 <Button 
                   isIconOnly 
@@ -151,7 +170,7 @@ export const ProductList: React.FC = () => {
                   variant="light" 
                   color="danger" 
                   aria-label="Delete product" 
-                  onPress={() => handleDeleteProduct(product)}
+                  onPress={() => handleConfirmDelete(product)}
                 >
                   <Icon icon="lucide:trash" />
                 </Button>
@@ -165,7 +184,7 @@ export const ProductList: React.FC = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader>
                 {modalAction === 'add' ? 'Add New Product' : 
                  modalAction === 'edit' ? 'Edit Product' : 'Delete Product'}
               </ModalHeader>
@@ -175,6 +194,8 @@ export const ProductList: React.FC = () => {
                     <Input
                       label="Name"
                       value={productForm.name}
+                      isInvalid={!!formErrors.name}
+                      errorMessage={formErrors.name}
                       onChange={(e) => setProductForm({...productForm, name: e.target.value})}
                     />
                     <Input
@@ -186,11 +207,15 @@ export const ProductList: React.FC = () => {
                       type="number"
                       label="Price"
                       value={productForm.price.toString()}
-                      onChange={(e) => setProductForm({...productForm, price: parseFloat(e.target.value)})}
+                      isInvalid={!!formErrors.price}
+                      errorMessage={formErrors.price}
+                      onChange={(e) => setProductForm({...productForm, price: parseFloat(e.target.value) || 0})}
                     />
                     <Select
                       label="Supplier"
                       selectedKeys={productForm.supplierId ? [productForm.supplierId] : []}
+                      isInvalid={!!formErrors.supplierId}
+                      errorMessage={formErrors.supplierId}
                       onChange={(e) => setProductForm({...productForm, supplierId: e.target.value})}
                     >
                       {suppliers.map((supplier) => (
@@ -199,14 +224,15 @@ export const ProductList: React.FC = () => {
                         </SelectItem>
                       ))}
                     </Select>
-                    />
                   </div>
                 ) : (
-                  <p>Are you sure you want to delete {selectedProduct?.name}?</p>
+                  <p className="text-red-600 font-semibold">
+                    Are you sure you want to delete <strong>{selectedProduct?.name}</strong>?
+                  </p>
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="default" variant="light" onPress={onClose}>
                   Cancel
                 </Button>
                 <Button 
