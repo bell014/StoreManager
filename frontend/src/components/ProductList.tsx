@@ -37,6 +37,7 @@ export const ProductList: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<{name?: string; price?: string; supplierId?: string}>({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'carousel'>('list');
 
   const loadData = async () => {
     try {
@@ -133,8 +134,9 @@ export const ProductList: React.FC = () => {
 
   return (
     <div>
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Products</h1>
+        <h1 className="text-2xl font-bold dark:text-gray-100">Products</h1>
         <div className="flex items-center gap-4">
           <Input
             placeholder="Search products..."
@@ -142,58 +144,115 @@ export const ProductList: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-64"
           />
+          <Button
+            isIconOnly
+            variant="light"
+            onPress={() => setViewMode(viewMode === 'list' ? 'carousel' : 'list')}
+          >
+            <Icon icon={viewMode === 'list' ? 'lucide:layout-grid' : 'lucide:list'} />
+          </Button>
           <Button color="primary" onPress={handleAddProduct}>
             <Icon icon="lucide:plus" className="mr-2" />
             Add Product
           </Button>
         </div>
       </div>
-      <Table aria-label="Products table" removeWrapper>
-        <TableHeader>
-          <TableColumn>NAME</TableColumn>
-          <TableColumn>DESCRIPTION</TableColumn>
-          <TableColumn>PRICE</TableColumn>
-          <TableColumn>SUPPLIER</TableColumn>
-          <TableColumn>ACTIONS</TableColumn>
-        </TableHeader>
-        <TableBody>
+
+      {/* List View */}
+      {viewMode === 'list' && (
+        <Table aria-label="Products table" removeWrapper>
+          <TableHeader>
+            <TableColumn>NAME</TableColumn>
+            <TableColumn>DESCRIPTION</TableColumn>
+            <TableColumn>PRICE</TableColumn>
+            <TableColumn>SUPPLIER</TableColumn>
+            <TableColumn>ACTIONS</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {products
+              .filter(product => 
+                product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.description.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.description}</TableCell>
+                <TableCell>${product.price.toFixed(2)}</TableCell>
+                <TableCell>{suppliers.find(s => s.id === product.supplierId)?.name || product.supplierId}</TableCell>
+                <TableCell>
+                  <Button 
+                    isIconOnly 
+                    size="sm" 
+                    variant="light" 
+                    aria-label="Edit product"
+                    onPress={() => handleEditProduct(product)}
+                  >
+                    <Icon icon="lucide:edit" />
+                  </Button>
+                  <Button 
+                    isIconOnly 
+                    size="sm" 
+                    variant="light" 
+                    color="danger" 
+                    aria-label="Delete product" 
+                    onPress={() => handleConfirmDelete(product)}
+                  >
+                    <Icon icon="lucide:trash" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+
+      {/* Carousel View */}
+      {viewMode === 'carousel' && (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {products
             .filter(product => 
               product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
               product.description.toLowerCase().includes(searchTerm.toLowerCase())
             )
-            .map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.description}</TableCell>
-              <TableCell>${product.price.toFixed(2)}</TableCell>
-              <TableCell>{suppliers.find(s => s.id === product.supplierId)?.name || product.supplierId}</TableCell>
-              <TableCell>
-                <Button 
-                  isIconOnly 
-                  size="sm" 
-                  variant="light" 
-                  aria-label="Edit product"
-                  onPress={() => handleEditProduct(product)}
-                >
-                  <Icon icon="lucide:edit" />
-                </Button>
-                <Button 
-                  isIconOnly 
-                  size="sm" 
-                  variant="light" 
-                  color="danger" 
-                  aria-label="Delete product" 
-                  onPress={() => handleConfirmDelete(product)}
-                >
-                  <Icon icon="lucide:trash" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+            .map(product => (
+              <div 
+                key={product.id} 
+                className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col justify-between"
+              >
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{product.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{product.description}</p>
+                <p className="mt-2 font-bold text-gray-900 dark:text-gray-100">${product.price.toFixed(2)}</p>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {suppliers.find(s => s.id === product.supplierId)?.name || product.supplierId}
+                </span>
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    isIconOnly 
+                    size="sm" 
+                    variant="light" 
+                    aria-label="Edit product"
+                    onPress={() => handleEditProduct(product)}
+                  >
+                    <Icon icon="lucide:edit" />
+                  </Button>
+                  <Button 
+                    isIconOnly 
+                    size="sm" 
+                    variant="light" 
+                    color="danger" 
+                    aria-label="Delete product" 
+                    onPress={() => handleConfirmDelete(product)}
+                  >
+                    <Icon icon="lucide:trash" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
 
+      {/* Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
