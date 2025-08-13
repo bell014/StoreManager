@@ -19,6 +19,7 @@ interface Product {
   description: string;
   price: number;
   supplierId: string;
+  imageUrl?: string;
 }
 
 export const ProductList: React.FC = () => {
@@ -33,7 +34,8 @@ export const ProductList: React.FC = () => {
     name: '', 
     description: '', 
     price: 0, 
-    supplierId: '' 
+    supplierId: '',
+    imageUrl: undefined
   });
   const [formErrors, setFormErrors] = useState<{name?: string; price?: string; supplierId?: string}>({});
   const [searchTerm, setSearchTerm] = useState('');
@@ -95,10 +97,13 @@ export const ProductList: React.FC = () => {
   const handleSubmitProduct = async () => {
     if (!validateForm()) return;
     try {
+      const imageInput = document.getElementById('product-image') as HTMLInputElement;
+      const imageFile = imageInput?.files?.[0];
+      
       if (modalAction === 'add') {
-        await createProduct(productForm);
+        await createProduct(productForm, imageFile);
       } else if (modalAction === 'edit' && selectedProduct) {
-        await updateProduct(selectedProduct.id, productForm);
+        await updateProduct(selectedProduct.id, productForm, imageFile);
       }
       await loadData();
       onOpenChange();
@@ -216,10 +221,23 @@ export const ProductList: React.FC = () => {
               product.description.toLowerCase().includes(searchTerm.toLowerCase())
             )
             .map(product => (
-              <div 
-                key={product.id} 
-                className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col justify-between"
-              >
+                <div 
+                  key={product.id} 
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col"
+                >
+                  <div className="aspect-square w-full mb-3 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden">
+                    {product.imageUrl ? (
+                      <img 
+                        src={product.imageUrl} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <Icon icon="lucide:image" className="w-12 h-12" />
+                      </div>
+                    )}
+                  </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{product.name}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{product.description}</p>
                 <p className="mt-2 font-bold text-gray-900 dark:text-gray-100">${product.price.toFixed(2)}</p>
@@ -297,6 +315,22 @@ export const ProductList: React.FC = () => {
                         </SelectItem>
                       ))}
                     </Select>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Product Image
+                      </label>
+                      <input
+                        id="product-image"
+                        type="file"
+                        accept="image/*"
+                        className="block w-full text-sm text-gray-500
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-md file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-blue-50 file:text-blue-700
+                          hover:file:bg-blue-100"
+                      />
+                    </div>
                   </div>
                 ) : (
                   <p className="text-red-600 font-semibold">

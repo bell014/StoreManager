@@ -42,12 +42,12 @@ public class MongoDataInitializer {
 
             // Create realistic products
             List<Product> products = Arrays.asList(
-                new Product("prod1", "UltraBook Pro", "15.6\" 4K Touchscreen, 16GB RAM, 1TB SSD", 1499.99, supplier1.getId()),
-                new Product("prod2", "Gaming Monitor", "32\" QHD 165Hz, 1ms Response", 499.99, supplier1.getId()),
-                new Product("prod3", "Wireless Keyboard", "Ergonomic, Bluetooth, Backlit", 79.99, supplier2.getId()),
-                new Product("prod4", "Office Chair", "Ergonomic, Adjustable, Mesh Back", 299.99, supplier2.getId()),
-                new Product("prod5", "Smart Speaker", "Voice Assistant, Hi-Fi Sound", 129.99, supplier3.getId()),
-                new Product("prod6", "Robot Vacuum", "Smart Mapping, Self-Charging", 399.99, supplier3.getId())
+                new Product("prod1", "UltraBook Pro", "15.6\" 4K Touchscreen, 16GB RAM, 1TB SSD", 1499.99, supplier1.getId(), null),
+                new Product("prod2", "Gaming Monitor", "32\" QHD 165Hz, 1ms Response", 499.99, supplier1.getId(), null),
+                new Product("prod3", "Wireless Keyboard", "Ergonomic, Bluetooth, Backlit", 79.99, supplier2.getId(), null),
+                new Product("prod4", "Office Chair", "Ergonomic, Adjustable, Mesh Back", 299.99, supplier2.getId(), null),
+                new Product("prod5", "Smart Speaker", "Voice Assistant, Hi-Fi Sound", 129.99, supplier3.getId(), null),
+                new Product("prod6", "Robot Vacuum", "Smart Mapping, Self-Charging", 399.99, supplier3.getId(), null)
             );
             productRepository.saveAll(products);
 

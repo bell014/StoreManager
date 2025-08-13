@@ -45,22 +45,33 @@ export const fetchProducts = async () => {
   }
 };
 
-export const updateProduct = async (productId: string, product: { 
-  name: string, 
-  description: string, 
-  price: number, 
-  supplierId: string 
-}) => {
+export const updateProduct = async (
+  productId: string, 
+  product: { 
+    name: string, 
+    description: string, 
+    price: number, 
+    supplierId: string 
+  },
+  image?: File
+) => {
   try {
+    const formData = new FormData();
+    formData.append('product', new Blob([JSON.stringify(product)], {
+      type: 'application/json'
+    }));
+    if (image) {
+      formData.append('image', image);
+    }
+
     const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(product),
+      body: formData,
     });
+
     if (!response.ok) {
-      throw new Error('Failed to update product');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to update product');
     }
     return await response.json();
   } catch (error) {
@@ -69,22 +80,32 @@ export const updateProduct = async (productId: string, product: {
   }
 };
 
-export const createProduct = async (product: { 
-  name: string, 
-  description: string, 
-  price: number, 
-  supplierId: string 
-}) => {
+export const createProduct = async (
+  product: { 
+    name: string, 
+    description: string, 
+    price: number, 
+    supplierId: string 
+  },
+  image?: File
+) => {
   try {
+    const formData = new FormData();
+    formData.append('product', new Blob([JSON.stringify(product)], {
+      type: 'application/json'
+    }));
+    if (image) {
+      formData.append('image', image);
+    }
+
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(product),
+      body: formData,
     });
+
     if (!response.ok) {
-      throw new Error('Failed to create product');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create product');
     }
     return await response.json();
   } catch (error) {

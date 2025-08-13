@@ -12,16 +12,18 @@ public class Product {
     private String description;
     private double price;
     private String supplierId;
+    private String imageUrl;
 
     public Product() {
     }
 
-    public Product(String id, String name, String description, double price, String supplierId) {
+    public Product(String id, String name, String description, double price, String supplierId, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.supplierId = supplierId;
+        this.imageUrl = imageUrl;
     }
 
     public String getId() {
@@ -62,5 +64,13 @@ public class Product {
 
     public void setSupplierId(String supplierId) {
         this.supplierId = supplierId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
