@@ -36,6 +36,7 @@ export const ProductList: React.FC = () => {
     supplierId: '' 
   });
   const [formErrors, setFormErrors] = useState<{name?: string; price?: string; supplierId?: string}>({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   const loadData = async () => {
     try {
@@ -134,10 +135,18 @@ export const ProductList: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Products</h1>
-        <Button color="primary" onPress={handleAddProduct}>
-          <Icon icon="lucide:plus" className="mr-2" />
-          Add Product
-        </Button>
+        <div className="flex items-center gap-4">
+          <Input
+            placeholder="Search products..."
+            startContent={<Icon icon="lucide:search" />}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-64"
+          />
+          <Button color="primary" onPress={handleAddProduct}>
+            <Icon icon="lucide:plus" className="mr-2" />
+            Add Product
+          </Button>
+        </div>
       </div>
       <Table aria-label="Products table" removeWrapper>
         <TableHeader>
@@ -148,7 +157,12 @@ export const ProductList: React.FC = () => {
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
-          {products.map((product) => (
+          {products
+            .filter(product => 
+              product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              product.description.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((product) => (
             <TableRow key={product.id}>
               <TableCell>{product.name}</TableCell>
               <TableCell>{product.description}</TableCell>

@@ -243,14 +243,26 @@ export const OrderList: React.FC = () => {
                       onChange={(e) => setNewOrder({...newOrder, shippingAddress: e.target.value})}
                     />
                     <Select
+                      label="Status"
+                      selectedKeys={[newOrder.status]}
+                      onSelectionChange={(keys) => {
+                        const selectedKey = Array.from(keys)[0];
+                        setNewOrder({...newOrder, status: selectedKey as string});
+                      }}
+                    >
+                      <SelectItem key="pending" value="pending">Pending</SelectItem>
+                      <SelectItem key="success" value="success">Success</SelectItem>
+                      <SelectItem key="declined" value="declined">Declined</SelectItem>
+                    </Select>
+                    <Select
                       label="Products"
                       selectionMode="multiple"
-                      selectedKeys={newOrder.items.map(item => item.toString())}
+                      selectedKeys={newOrder.items.map(item => item.productId)}
                       onSelectionChange={handleProductsChange}
                     >
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
-                          {product.name}
+                          {product.name} (${product.price})
                         </SelectItem>
                       ))}
                     </Select>
