@@ -1,4 +1,96 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://localhost:8080/api';
+
+// Authentication services
+export const signup = async (userData: { email: string; password: string; name: string }) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        name: userData.name,
+        email: userData.email,
+        password: userData.password
+      }),
+    });
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { message: 'Registration failed - server error' };
+      }
+      throw new Error(errorData.message || 'Registration failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Signup error:', error);
+    throw new Error(
+      error instanceof Error 
+        ? error.message 
+        : 'An unexpected error occurred during registration'
+    );
+  }
+};
+
+export const login = async (email: string, password: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!response.ok) {
+      throw new Error('Login failed');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Logout failed');
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
+};
+
+export const checkAuthStatus = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/status`, {
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Not authenticated');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Auth status check error:', error);
+    throw error;
+  }
+};
 
 export const fetchInventory = async () => {
   try {

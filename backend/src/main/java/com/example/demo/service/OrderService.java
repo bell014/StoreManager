@@ -56,7 +56,10 @@ public class OrderService {
         if (orderId == null) {
             throw new IllegalArgumentException("Order ID cannot be null");
         }
-        orderItemsRepository.updateOrderItems(orderId, items);
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        order.setItems(items);
+        orderRepository.save(order);
     }
 
     public void deleteOrder(String id) {

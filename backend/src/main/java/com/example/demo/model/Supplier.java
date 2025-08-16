@@ -72,4 +72,18 @@ public class Supplier {
     public void setWebsite(String website) {
         this.website = website;
     }
+
+    public String getContact() {
+        return String.format("Email: %s, Phone: %s", email, phone);
+    }
+
+    public void setContact(String contact) {
+        if (contact != null) {
+            String[] parts = contact.split(", ");
+            if (parts.length >= 2) {
+                this.email = parts[0].replace("Email: ", "");
+                this.phone = parts[1].replace("Phone: ", "");
+            }
+        }
+    }
 }

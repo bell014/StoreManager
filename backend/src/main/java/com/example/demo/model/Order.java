@@ -20,6 +20,7 @@ public class Order {
     private String customerEmail;
     private String shippingAddress;
     private List<OrderItem> items;
+    private String supplierId;
 
     public Order() {
         this.orderDate = new Date();
@@ -118,5 +119,13 @@ public class Order {
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
+    }
+
+    public String getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(String supplierId) {
+        this.supplierId = supplierId;
     }
 }
