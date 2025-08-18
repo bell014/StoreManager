@@ -1,60 +1,100 @@
-# Retail Store Management Backend
+# Retail Store Management System
 
-Welcome to the backend for the Retail Store Management application! This Spring Boot application provides the core API services for managing products, suppliers, inventory, and customer orders.
+A full-stack application for managing retail store operations, including inventory, products, suppliers, and orders.
 
-## Technologies Used
+![Project Screenshot](https://via.placeholder.com/800x400?text=Store+Management+System+Screenshot)
 
-*   **Spring Boot:** Provides the foundation for building a robust and easy-to-deploy application.
-*   **Maven:** Used for dependency management and building the project.
-*   **SQLite:** A lightweight, file-based database used for storing application data.
+## Features
 
-## Functionality
+- **Product Management**: Track all store products with details
+- **Inventory Control**: Monitor and update stock levels
+- **Supplier Management**: Maintain supplier information
+- **Order Processing**: Handle customer orders and fulfillment
+- **User Authentication**: Secure login and access control
 
-This backend exposes RESTful APIs to manage the following entities:
+## Technologies
 
-### Products
+### Frontend
+- React with TypeScript
+- Vite build tool
+- Tailwind CSS for styling
+- Axios for API communication
 
-Manage information about the products available in the store.
-
-*   `GET /products`: Get a list of all products.
-*   `GET /products/{id}`: Get details of a specific product by ID.
-*   `POST /products`: Create a new product.
-*   `PUT /products/{id}`: Update an existing product by ID.
-*   `DELETE /products/{id}`: Delete a product by ID.
-
-### Suppliers
-
-Manage information about product suppliers.
-
-*   `GET /suppliers`: Get a list of all suppliers.
-*   `GET /suppliers/{id}`: Get details of a specific supplier by ID.
-*   `POST /suppliers`: Create a new supplier.
-*   `PUT /suppliers/{id}`: Update an existing supplier by ID.
-*   `DELETE /suppliers/{id}`: Delete a supplier by ID.
-
-### Inventory
-
-Manage the stock levels of products.
-
-*   `GET /inventory`: Get the current inventory levels for all products.
-*   `GET /inventory/{productId}`: Get the inventory level for a specific product.
-*   `POST /inventory/add`: Add stock to a product (request body likely includes productId and quantity).
-*   `POST /inventory/remove`: Remove stock from a product (request body likely includes productId and quantity).
-*   `PUT /inventory/{productId}`: Update the inventory level for a specific product.
-
-### Orders
-
-Handle customer orders.
-
-*   `GET /orders`: Get a list of all orders.
-*   `GET /orders/{id}`: Get details of a specific order by ID.
-*   `POST /orders`: Create a new order (request body likely includes product(s) and quantity(ies)).
-*   `PUT /orders/{id}`: Update an existing order by ID.
-*   `DELETE /orders/{id}`: Cancel or delete an order by ID.
+### Backend
+- Spring Boot (Java)
+- SQLite database
+- JWT authentication
+- RESTful API design
 
 ## Getting Started
 
-Server should run automatically when starting a workspace. To run manually, run:
+### Prerequisites
+- Node.js (v16+) for frontend
+- Java JDK (17+) for backend
+- Maven for backend dependencies
+
+### Installation
+
+1. **Clone the repository**
 ```sh
+git clone https://github.com/your-repo/store-management.git
+cd store-management
+```
+
+2. **Backend Setup**
+```sh
+cd backend
+mvn install
 mvn spring-boot:run
 ```
+
+3. **Frontend Setup**
+```sh
+cd ../frontend
+npm install
+npm run dev
+```
+
+## API Documentation
+
+The backend provides RESTful endpoints for all operations:
+
+### Products
+- `GET /products` - List all products
+- `POST /products` - Create new product
+- `GET /products/{id}` - Get product details
+- `PUT /products/{id}` - Update product
+- `DELETE /products/{id}` - Remove product
+
+### Inventory
+- `GET /inventory` - Current stock levels
+- `POST /inventory/add` - Add stock
+- `POST /inventory/remove` - Remove stock
+
+### Orders
+- `GET /orders` - List all orders
+- `POST /orders` - Create new order
+- `GET /orders/{id}` - Get order details
+
+## Screenshots
+
+1. **Dashboard View**  
+![Dashboard](https://via.placeholder.com/400x200?text=Dashboard)
+
+2. **Product Management**  
+![Products](https://via.placeholder.com/400x200?text=Products)
+
+3. **Order Processing**  
+![Orders](https://via.placeholder.com/400x200?text=Orders)
+
+## Contributing
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
