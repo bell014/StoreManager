@@ -228,7 +228,7 @@ export const ProductList: React.FC = () => {
                   <div className="aspect-square w-full mb-3 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden">
                     {product.imageUrl ? (
                       <img 
-                        src={product.imageUrl} 
+                        src={`http://localhost:8080${product.imageUrl}`} 
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />

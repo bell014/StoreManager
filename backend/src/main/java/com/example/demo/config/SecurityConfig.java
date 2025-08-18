@@ -29,6 +29,12 @@ public class SecurityConfig {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeHttpRequests()
             .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/products/**").permitAll()
+            .requestMatchers("/api/suppliers/**").permitAll()
+            .requestMatchers("/api/inventory/**").permitAll()
+            .requestMatchers("/api/orders/**").permitAll()
+            .requestMatchers("GET", "/api/**").permitAll()
+            .requestMatchers("/uploads/**").permitAll()
             .anyRequest().authenticated().and()
             .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
 

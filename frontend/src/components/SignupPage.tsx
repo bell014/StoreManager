@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { signup } from '../apiService';
 import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +15,8 @@ const SignupPage: React.FC = () => {
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
+
+  const history = useHistory();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +32,9 @@ const SignupPage: React.FC = () => {
     try {
       const response = await signup({ email, password, name });
       console.log('Signup successful:', response);
-      // TODO: Handle successful signup (redirect, etc.)
+      if (response.redirectTo) {
+        history.push(response.redirectTo);
+      }
     } catch (err: any) {
       console.error('Signup error:', err);
       if (err instanceof Error) {

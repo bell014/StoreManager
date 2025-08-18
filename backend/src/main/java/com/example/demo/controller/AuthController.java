@@ -52,7 +52,10 @@ public class AuthController {
             );
             
             userRepository.save(user);
-            return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
+            return ResponseEntity.ok(Map.of(
+                "message", "User registered successfully!",
+                "redirectTo", "/login"
+            ));
             
         } catch (Exception e) {
             return ResponseEntity
@@ -74,11 +77,12 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateToken((User) authentication.getPrincipal());
             
-            return ResponseEntity.ok(new LoginResponse(
-                jwt,
-                ((User) authentication.getPrincipal()).getId(),
-                ((User) authentication.getPrincipal()).getEmail(),
-                ((User) authentication.getPrincipal()).getRole()
+            return ResponseEntity.ok(Map.of(
+                "token", jwt,
+                "id", ((User) authentication.getPrincipal()).getId(),
+                "email", ((User) authentication.getPrincipal()).getEmail(),
+                "role", ((User) authentication.getPrincipal()).getRole(),
+                "redirectTo", "/dashboard"
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", "Invalid email or password"));

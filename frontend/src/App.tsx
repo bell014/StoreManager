@@ -38,7 +38,7 @@ const App: React.FC = () => {
                 </NavbarBrand>
                 <NavbarContent className="hidden sm:flex gap-4" justify="center">
                   <NavbarItem>
-                    <Link to="/" className="text-foreground">
+                    <Link to="/dashboard" className="text-foreground">
                       Dashboard
                     </Link>
                   </NavbarItem>
@@ -84,7 +84,7 @@ const App: React.FC = () => {
               </Navbar>
               <main className="container mx-auto px-4 py-8">
                 <RouterSwitch>
-                  <Route exact path="/" component={Dashboard} />
+                  <Route exact path="/dashboard" component={Dashboard} />
                   <Route path="/products" component={ProductList} />
                   <Route path="/suppliers" component={SupplierList} />
                   <Route path="/inventory" component={InventoryList} />

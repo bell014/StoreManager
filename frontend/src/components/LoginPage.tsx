@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { login } from '../apiService';
 import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,15 +13,16 @@ const LoginPage: React.FC = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
+  const history = useHistory();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await login(email, password);
-      console.log('Login successful:', response);
-      // TODO: Handle successful login (redirect, set auth state, etc.)
+      await login(email, password);
+      history.push('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
       setError('Invalid email or password');
