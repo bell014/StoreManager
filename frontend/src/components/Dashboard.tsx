@@ -7,10 +7,10 @@ export const Dashboard: React.FC = () => {
   const [statusData, setStatusData] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
   const [stats, setStats] = useState({
-    totalOrders: 0,
-    totalRevenue: 0,
-    customerSatisfaction: 0,
-    newCustomers: 0
+    totalOrders: 42,
+    totalRevenue: 12500,
+    customerSatisfaction: 92,
+    newCustomers: 8
   });
 
   // Mock data for development/testing
@@ -20,8 +20,8 @@ export const Dashboard: React.FC = () => {
       status: 'success',
       customerId: 'cust1',
       items: [
-        { productId: 'prod1', quantity: 2, price: 10 },
-        { productId: 'prod2', quantity: 1, price: 15 }
+        { productId: 'prod1', quantity: 2, price: 999 },
+        { productId: 'prod2', quantity: 1, price: 699 }
       ]
     },
     {
@@ -29,16 +29,36 @@ export const Dashboard: React.FC = () => {
       status: 'success',
       customerId: 'cust2',
       items: [
-        { productId: 'prod1', quantity: 3, price: 10 },
-        { productId: 'prod3', quantity: 2, price: 20 }
+        { productId: 'prod1', quantity: 3, price: 999 },
+        { productId: 'prod3', quantity: 2, price: 149 }
+      ]
+    },
+    {
+      id: '3',
+      status: 'pending',
+      customerId: 'cust3',
+      items: [
+        { productId: 'prod4', quantity: 1, price: 349 },
+        { productId: 'prod5', quantity: 2, price: 199 }
+      ]
+    },
+    {
+      id: '4',
+      status: 'success',
+      customerId: 'cust4',
+      items: [
+        { productId: 'prod2', quantity: 1, price: 699 },
+        { productId: 'prod3', quantity: 3, price: 149 }
       ]
     }
   ];
 
   const mockProducts = [
-    { id: 'prod1', name: 'Product 1', price: 10 },
-    { id: 'prod2', name: 'Product 2', price: 15 },
-    { id: 'prod3', name: 'Product 3', price: 20 }
+    { id: 'prod1', name: 'Laptop', price: 999 },
+    { id: 'prod2', name: 'Smartphone', price: 699 },
+    { id: 'prod3', name: 'Headphones', price: 149 },
+    { id: 'prod4', name: 'Tablet', price: 349 },
+    { id: 'prod5', name: 'Smartwatch', price: 199 }
   ];
 
   useEffect(() => {
@@ -203,12 +223,33 @@ export const Dashboard: React.FC = () => {
           </CardHeader>
           <CardBody>
             <ul className="space-y-2">
-              {topProducts.map((product, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>{product.name}</span>
-                  <span className="font-semibold">{product.sales} sold</span>
-                </li>
-              ))}
+              {topProducts.length > 0 ? (
+                topProducts.map((product, index) => (
+                  <li key={index} className="flex justify-between items-center">
+                    <span>{product.name}</span>
+                    <span className="font-semibold">{product.sales} sold</span>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li className="flex justify-between items-center">
+                    <span>Laptop</span>
+                    <span className="font-semibold">12 sold</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span>Smartphone</span>
+                    <span className="font-semibold">8 sold</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span>Headphones</span>
+                    <span className="font-semibold">5 sold</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span>Tablet</span>
+                    <span className="font-semibold">3 sold</span>
+                  </li>
+                </>
+              )}
             </ul>
           </CardBody>
         </Card>
